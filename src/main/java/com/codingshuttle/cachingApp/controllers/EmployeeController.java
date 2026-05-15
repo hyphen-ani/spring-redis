@@ -1,7 +1,9 @@
 package com.codingshuttle.cachingApp.controllers;
 
 import com.codingshuttle.cachingApp.dto.EmployeeDto;
+import com.codingshuttle.cachingApp.entities.Salary;
 import com.codingshuttle.cachingApp.services.EmployeeService;
+import com.codingshuttle.cachingApp.services.SalaryAccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class EmployeeController {
 
     private final EmployeeService employeeService;
+    private final SalaryAccountService salaryAccountService;
 
     @GetMapping("/{id}")
     public ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable Long id) {
@@ -36,6 +39,12 @@ public class EmployeeController {
     public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
         employeeService.deleteEmployee(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/increment-balance/{accountId}")
+    public ResponseEntity<Salary> incrementBalance(@PathVariable Long accountId){
+        Salary salary = salaryAccountService.incrementBalance(accountId);
+        return ResponseEntity.ok(salary);
     }
 
 }

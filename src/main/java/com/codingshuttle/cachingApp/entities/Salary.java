@@ -1,5 +1,6 @@
 package com.codingshuttle.cachingApp.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,5 +21,6 @@ public class Salary {
     private BigDecimal balance;
 
     @OneToOne
+    @JsonIgnore
     private Employee employee;
 }
