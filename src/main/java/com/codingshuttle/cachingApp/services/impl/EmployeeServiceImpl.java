@@ -5,6 +5,8 @@ import com.codingshuttle.cachingApp.entities.Employee;
 import com.codingshuttle.cachingApp.exceptions.ResourceNotFoundException;
 import com.codingshuttle.cachingApp.repositories.EmployeeRepository;
 import com.codingshuttle.cachingApp.services.EmployeeService;
+import com.codingshuttle.cachingApp.services.SalaryAccountService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -12,7 +14,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final ModelMapper modelMapper;
     private final String CACHE_NAME = "employees";
+    private final SalaryAccountService salaryAccountService;
 
 
     @Override
@@ -40,8 +42,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    @Transactional
     @CachePut(cacheNames = CACHE_NAME, key = "#result.id")
+    @Transactional
     public EmployeeDto createNewEmployee(EmployeeDto employeeDto) {
         log.info("Creating new employee with email: {}", employeeDto.getEmail());
         List<Employee> existingEmployees = employeeRepository.findByEmail(employeeDto.getEmail());
@@ -52,8 +54,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         Employee newEmployee = modelMapper.map(employeeDto, Employee.class);
         Employee savedEmployee = employeeRepository.save(newEmployee);
+        salaryAccountService.createAccount(savedEmployee);
 
         log.info("Successfully created new employee with id: {}", savedEmployee.getId());
+
         return modelMapper.map(savedEmployee, EmployeeDto.class);
     }
 
