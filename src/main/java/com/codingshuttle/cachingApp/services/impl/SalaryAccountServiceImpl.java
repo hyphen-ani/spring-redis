@@ -6,7 +6,6 @@ import com.codingshuttle.cachingApp.repositories.SalaryRepository;
 import com.codingshuttle.cachingApp.services.SalaryAccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -18,7 +17,7 @@ public class SalaryAccountServiceImpl implements SalaryAccountService {
     private final SalaryRepository salaryRepository;
 
     @Override
-    @Transactional(isolation = Isolation.SERIALIZABLE)
+    @Transactional
     public Salary incrementBalance(Long accountId) {
         Salary salary = salaryRepository.findById(accountId).orElseThrow(
                 () -> new RuntimeException("Salary Account Not Found")
